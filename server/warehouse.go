@@ -20,6 +20,21 @@ func NewWarehouse(l hclog.Logger) *Warehouse {
 // GetRate implements the CurrencyServer GetRate method and returns the currency exchange rate
 // for the two given currencies.
 func (c *Warehouse) GetItem(ctx context.Context, rr *protos.UUID) (*protos.GetItemResponse, error) {
-	c.log.Info("Handle request for GetRate", "base", rr.GetBase(), "dest", rr.GetDestination())
-	return &protos.GetItemResponse{Rate: 0.5}, nil
+	data := "kek"
+	
+	return &protos.GetItemResponse{Name: data}, nil
 }
+
+func (c *Warehouse) SetItem(ctx context.Context, rr *protos.UUID) (*protos.OperationResultResponse, error) {
+	data := "kek"
+	
+	return &protos.OperationResultResponse{Msg: data} , nil
+}
+
+func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.UUID) (*protos.OperationResultResponse, error) {
+	data := "kek"
+	
+	return &protos.OperationResultResponse{Msg: data}, nil
+}
+
+
