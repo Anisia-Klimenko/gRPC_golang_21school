@@ -26,7 +26,7 @@ var Backups = map[string]string{
 	"backup2": "backup/replica2.json",
 }
 
-func GetItemFromBackup(uuid protos.UUID) (protos.GetItemResponse, error) {
+func GetItemFromBackup(uuid *protos.UUID) (protos.GetItemResponse, error) {
 	var db []DB
 	var err error
 	for _, file := range Backups {
@@ -65,7 +65,7 @@ func SetItemToBackup(elem string) protos.OperationResultResponse {
 	return protos.OperationResultResponse{Msg: "created (2 replicas)"}
 }
 
-func DeleteItemToBackup(uuid string) protos.OperationResultResponse {
+func DeleteItemFromBackup(uuid *protos.UUID) protos.OperationResultResponse {
 	var db []DB
 	var err error
 	for _, file := range Backups {
@@ -79,7 +79,7 @@ func DeleteItemToBackup(uuid string) protos.OperationResultResponse {
 		return protos.OperationResultResponse{Msg: "backups broken"}
 	}
 	for index, elem := range db {
-		if elem.Elem.Name == uuid {
+		if elem.Elem.Name == uuid.Value {
 			db = append(db[:index], db[index+1:]...)
 			break
 		}
