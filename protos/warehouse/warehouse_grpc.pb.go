@@ -69,7 +69,6 @@ type WarehouseServer interface {
 	GetItem(context.Context, *UUID) (*GetItemResponse, error)
 	SetItem(context.Context, *UUID) (*OperationResultResponse, error)
 	DeleteItem(context.Context, *UUID) (*OperationResultResponse, error)
-	mustEmbedUnimplementedWarehouseServer()
 }
 
 // UnimplementedWarehouseServer must be embedded to have forward compatible implementations.
