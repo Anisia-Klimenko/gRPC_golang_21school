@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
 )
 
@@ -21,6 +22,7 @@ func (c *Warehouse) GetItem(ctx context.Context, rr *protos.UUID) (*protos.GetIt
 	data, err := GetItemFromBackup(rr)
 	if err != nil {
 		data = err}
+
 	return &protos.GetItemResponse{Name: data}, nil
 }
 
