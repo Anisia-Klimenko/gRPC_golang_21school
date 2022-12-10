@@ -19,7 +19,7 @@ func NewWarehouse(l hclog.Logger) *Warehouse {
 
 // GetRate implements the CurrencyServer GetRate method and returns the currency exchange rate
 // for the two given currencies.
-func (c *Warehouse) GetRate(ctx context.Context, rr *protos.GetIt) (*protos.RateResponse, error) {
+func (c *Warehouse) GetItem(ctx context.Context, rr *protos.UUID) (*protos.GetItemResponse, error) {
 	c.log.Info("Handle request for GetRate", "base", rr.GetBase(), "dest", rr.GetDestination())
-	return &protos.RateResponse{Rate: 0.5}, nil
+	return &protos.GetItemResponse{Rate: 0.5}, nil
 }

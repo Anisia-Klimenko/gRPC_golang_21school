@@ -1,12 +1,12 @@
 syntax = "proto3";
 
+option go_package = "./";
 service Warehouse {
     rpc GetItem(UUID) returns (GetItemResponse);
     rpc SetItem(UUID) returns (OperationResultResponse);
     rpc DeleteItem(UUID) returns (OperationResultResponse);
 }
 
-option go_package = "./";
 
 message UUID {
     string value = 1;

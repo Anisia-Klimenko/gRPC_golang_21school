@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.9
-// source: warehouse.proto
+// source: protos/warehouse.proto
 
 package __
 
@@ -173,5 +173,5 @@ var Warehouse_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "warehouse.proto",
+	Metadata: "protos/warehouse.proto",
 }
