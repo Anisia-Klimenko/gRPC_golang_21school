@@ -102,11 +102,16 @@ func main() {
 }
 
 func SendResponce(client protos.WarehouseClient){
+	var strs []string
 	for {
 		myscanner := bufio.NewScanner(os.Stdin)
 		myscanner.Scan()
 		line := myscanner.Text()
-		strs := strings.Split(line, " ")
+		if strings.Contains(line, "{") {
+			strs = strings.SplitN(line, " ", 3)
+		} else {
+			strs = strings.Split(line, " ")
+		}
 		switch {
 			case len(strs) != 2 && len(strs) != 3:
 				err := errors.New("non-valid amount of arguments")
