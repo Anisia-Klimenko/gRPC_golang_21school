@@ -94,7 +94,7 @@ func (c *Warehouse) SetItem(ctx context.Context, rr *protos.Item) (*protos.Opera
 	return &protos.OperationResultResponse{Msg: "created (2 replicas)"}, nil
 }
 
-func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.Item) (*protos.OperationResultResponse, error) {
+func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.ItemRequest) (*protos.OperationResultResponse, error) {
 	var db []protos.Item
 	var err error
 	_, err = uuid.Parse(rr.UUID)
