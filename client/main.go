@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 
+	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
+
 	"google.golang.org/grpc"
 )
 
@@ -25,6 +27,19 @@ func knownHosts(ports []int) {
 	}
 }
 
+type RequestType int
+
+const (
+	GET    RequestType = 1
+	SET    RequestType = 2
+	DELETE RequestType = 3
+)
+
+type Response struct {
+	Type RequestType
+	Body any
+}
+
 func main() {
 
 	fHost := *flag.String("host", "127.0.0.1", "--host 127.0.0.1")
@@ -42,9 +57,10 @@ func main() {
 		knownHosts(ports)
 		defer conn.Close()
 	} else {
-		
+		r := Response{GET, protos.ItemRequest{UUID: "asdas"}}
 	}
 }
+
 // go func() {
 // 	knownHosts(ports)
 // }()
