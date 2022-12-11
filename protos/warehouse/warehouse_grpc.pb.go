@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WarehouseClient interface {
-	GetItem(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*GetItemResponse, error)
-	SetItem(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*OperationResultResponse, error)
-	DeleteItem(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*OperationResultResponse, error)
+	GetItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*Item, error)
+	SetItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error)
+	DeleteItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error)
 }
 
 type warehouseClient struct {
@@ -35,8 +35,8 @@ func NewWarehouseClient(cc grpc.ClientConnInterface) WarehouseClient {
 	return &warehouseClient{cc}
 }
 
-func (c *warehouseClient) GetItem(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*GetItemResponse, error) {
-	out := new(GetItemResponse)
+func (c *warehouseClient) GetItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*Item, error) {
+	out := new(Item)
 	err := c.cc.Invoke(ctx, "/Warehouse/GetItem", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (c *warehouseClient) GetItem(ctx context.Context, in *UUID, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *warehouseClient) SetItem(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*OperationResultResponse, error) {
+func (c *warehouseClient) SetItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error) {
 	out := new(OperationResultResponse)
 	err := c.cc.Invoke(ctx, "/Warehouse/SetItem", in, out, opts...)
 	if err != nil {
@@ -53,7 +53,7 @@ func (c *warehouseClient) SetItem(ctx context.Context, in *UUID, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *warehouseClient) DeleteItem(ctx context.Context, in *UUID, opts ...grpc.CallOption) (*OperationResultResponse, error) {
+func (c *warehouseClient) DeleteItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error) {
 	out := new(OperationResultResponse)
 	err := c.cc.Invoke(ctx, "/Warehouse/DeleteItem", in, out, opts...)
 	if err != nil {
@@ -66,22 +66,23 @@ func (c *warehouseClient) DeleteItem(ctx context.Context, in *UUID, opts ...grpc
 // All implementations must embed UnimplementedWarehouseServer
 // for forward compatibility
 type WarehouseServer interface {
-	GetItem(context.Context, *UUID) (*GetItemResponse, error)
-	SetItem(context.Context, *UUID) (*OperationResultResponse, error)
-	DeleteItem(context.Context, *UUID) (*OperationResultResponse, error)
+	GetItem(context.Context, *ItemRequest) (*Item, error)
+	SetItem(context.Context, *Item) (*OperationResultResponse, error)
+	DeleteItem(context.Context, *Item) (*OperationResultResponse, error)
+	mustEmbedUnimplementedWarehouseServer()
 }
 
 // UnimplementedWarehouseServer must be embedded to have forward compatible implementations.
 type UnimplementedWarehouseServer struct {
 }
 
-func (UnimplementedWarehouseServer) GetItem(context.Context, *UUID) (*GetItemResponse, error) {
+func (UnimplementedWarehouseServer) GetItem(context.Context, *ItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetItem not implemented")
 }
-func (UnimplementedWarehouseServer) SetItem(context.Context, *UUID) (*OperationResultResponse, error) {
+func (UnimplementedWarehouseServer) SetItem(context.Context, *Item) (*OperationResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetItem not implemented")
 }
-func (UnimplementedWarehouseServer) DeleteItem(context.Context, *UUID) (*OperationResultResponse, error) {
+func (UnimplementedWarehouseServer) DeleteItem(context.Context, *Item) (*OperationResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteItem not implemented")
 }
 func (UnimplementedWarehouseServer) mustEmbedUnimplementedWarehouseServer() {}
@@ -98,7 +99,7 @@ func RegisterWarehouseServer(s grpc.ServiceRegistrar, srv WarehouseServer) {
 }
 
 func _Warehouse_GetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UUID)
+	in := new(ItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -110,13 +111,13 @@ func _Warehouse_GetItem_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/Warehouse/GetItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WarehouseServer).GetItem(ctx, req.(*UUID))
+		return srv.(WarehouseServer).GetItem(ctx, req.(*ItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Warehouse_SetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UUID)
+	in := new(Item)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -128,13 +129,13 @@ func _Warehouse_SetItem_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/Warehouse/SetItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WarehouseServer).SetItem(ctx, req.(*UUID))
+		return srv.(WarehouseServer).SetItem(ctx, req.(*Item))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Warehouse_DeleteItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UUID)
+	in := new(Item)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -146,7 +147,7 @@ func _Warehouse_DeleteItem_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/Warehouse/DeleteItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WarehouseServer).DeleteItem(ctx, req.(*UUID))
+		return srv.(WarehouseServer).DeleteItem(ctx, req.(*Item))
 	}
 	return interceptor(ctx, in, info, handler)
 }

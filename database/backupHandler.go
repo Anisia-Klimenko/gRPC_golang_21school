@@ -1,13 +1,14 @@
-package server
+package main
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"os"
+
+	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
+	"github.com/google/uuid"
 )
 
 type DB struct {

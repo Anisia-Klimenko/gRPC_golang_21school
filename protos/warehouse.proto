@@ -1,20 +1,21 @@
 syntax = "proto3";
 
 option go_package = "./";
+
 service Warehouse {
-    rpc GetItem(UUID) returns (GetItemResponse);
-    rpc SetItem(UUID) returns (OperationResultResponse);
-    rpc DeleteItem(UUID) returns (OperationResultResponse);
+    rpc GetItem(ItemRequest) returns (Item);
+    rpc SetItem(Item) returns (OperationResultResponse);
+    rpc DeleteItem(Item) returns (OperationResultResponse);
 }
 
 
-message UUID {
-    string value = 1;
-  }
+message Item {
+    string UUID = 1;
+    string content = 2;
 
-message GetItemResponse {
-    string name = 1;
+}
+message ItemRequest {
+    string UUID = 1;
 }
 message OperationResultResponse {
-    string msg = 1;
-}
+    string msg = 1;}

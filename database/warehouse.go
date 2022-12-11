@@ -4,30 +4,32 @@ import (
 	"context"
 
 	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
+	database "github.com/Anisia-Klimenko/gRPC_golang_21school/database"
 )
 
-// Currency is a gRPC server it implements the methods defined by the CurrencyServer interface
+// Warehouse Currency is a gRPC database it implements the methods defined by the Currencydatabase interface
 type Warehouse struct {
 	// log hclog.Logger
 }
 
-// NewCurrency creates a new Currency server
+// NewWarehouse NewCurrency creates a new Currency database
 func NewWarehouse() *Warehouse {
 	return &Warehouse{}
 }
 
-// GetRate implements the CurrencyServer GetRate method and returns the currency exchange rate
+// GetItem GetRate implements the Currencydatabase GetRate method and returns the currency exchange rate
 // for the two given currencies.
-func (c *Warehouse) GetItem(ctx context.Context, rr *protos.UUID) (*protos.GetItemResponse, error) {
-	data, err := GetItemFromBackup(rr)
+func (c *Warehouse) GetItem(ctx context.Context, rr *protos.Item) (*protos.Item, error) {
+	response, err := database.GetItemFromBackup(rr)
 	if err != nil {
-		data = err}
+		return &protos.Item{}, err
+	}
 
 	return &protos.GetItemResponse{Name: data}, nil
 }
 
-func (c *Warehouse) SetItem(ctx context.Context, rr *protos.UUID) (*protos.OperationResultResponse, error) {
-	data, err := SetItemFromBackup(rr)
+func (c *Warehouse) SetItem(ctx context.Context, id *protos.Item, data *protos.Item) (*protos.OperationResultResponse, error) {
+	response, err := database.SetItemToBackup(id, data)
 	if err != nil {
 		data = err
 	}else {
@@ -35,12 +37,13 @@ func (c *Warehouse) SetItem(ctx context.Context, rr *protos.UUID) (*protos.Opera
 	return &protos.OperationResultResponse{Msg: data} , nil
 }
 
-func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.UUID) (*protos.OperationResultResponse, error) {
-	data, err := DeleteItemFromBackup(rr)
-	if err != nil {
-		data = err;
-	}else {
-		data = "The item was deleted\n"}
+func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.Item) (*protos.OperationResultResponse, error) {
+	response := database.DeleteItemFromBackup(rr)
+	//if err != nil {
+	//	data = err
+	//} else {
+	//	data = "The item was deleted\n"
+	//}
 
 	return &protos.OperationResultResponse{Msg: data}, nil
 }
