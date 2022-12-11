@@ -25,6 +25,19 @@ func knownHosts(ports []int) {
 	}
 }
 
+type RequestType int
+
+const (
+	GET    RequestType = 1
+	SET    RequestType = 2
+	DELETE RequestType = 3
+)
+
+type Response struct {
+	Type RequestType
+	Body any
+}
+
 func main() {
 
 	fHost := *flag.String("host", "127.0.0.1", "--host 127.0.0.1")
@@ -42,9 +55,10 @@ func main() {
 		knownHosts(ports)
 		defer conn.Close()
 	} else {
-		
+
 	}
 }
+
 // go func() {
 // 	knownHosts(ports)
 // }()
