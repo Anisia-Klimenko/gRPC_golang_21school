@@ -28,13 +28,13 @@ func (c *Warehouse) GetItem(ctx context.Context, rr *protos.UUID) (*protos.GetIt
 	return &response, nil
 }
 
-func (c *Warehouse) SetItem(ctx context.Context, rr string) (*protos.OperationResultResponse, error) {
-	response := server.SetItemToBackup(rr)
-	//if err != nil {
-	//	data = err
-	//} else {
-	//	data = "The elem was created\n"
-	//}
+func (c *Warehouse) SetItem(ctx context.Context, id *protos.UUID, data *protos.GetItemResponse) (*protos.OperationResultResponse, error) {
+	response, err := server.SetItemToBackup(id, data)
+	if err != nil {
+		return &response, err
+		//} else {
+		//	data = "The elem was created\n"
+	}
 	return &response, nil
 }
 
