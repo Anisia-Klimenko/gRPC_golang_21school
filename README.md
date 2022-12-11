@@ -1,6 +1,6 @@
 # gRPC_golang_21school
 
-- [ ] UUID check
+- [x] UUID check
 - [ ] endless input parse
 - [ ] set, get, delete logic
 - [ ] connection to database check
