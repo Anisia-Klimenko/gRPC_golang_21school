@@ -48,9 +48,15 @@ func GetItemFromBackup(uuid *protos.UUID) (protos.GetItemResponse, error) {
 }
 
 func SetItemToBackup(id *protos.UUID, req *protos.GetItemResponse) (protos.OperationResultResponse, error) {
-	var newId, err = uuid.Parse(id.Value)
-	if err != nil {
-		return protos.OperationResultResponse{Msg: "error: key is not a proper uuid4"}, err
+	var newId uuid.UUID
+	var err error
+	if len(id.Value) == 0 {
+		newId = uuid.New()
+	} else {
+		newId, err = uuid.Parse(id.Value)
+		if err != nil {
+			return protos.OperationResultResponse{Msg: "error: key is not a proper uuid4"}, err
+		}
 	}
 	var newElem = DB{protos.UUID{Value: newId.String()}, *req}
 	//var newElem = DB{protos.UUID{Value: uuid.New().String()}, protos.GetItemResponse{Name: elem}}
