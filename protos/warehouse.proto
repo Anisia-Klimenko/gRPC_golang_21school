@@ -5,7 +5,7 @@ option go_package = "./";
 service Warehouse {
     rpc GetItem(ItemRequest) returns (Item);
     rpc SetItem(Item) returns (OperationResultResponse);
-    rpc DeleteItem(Item) returns (OperationResultResponse);
+    rpc DeleteItem(ItemRequest) returns (OperationResultResponse);
 }
 
 

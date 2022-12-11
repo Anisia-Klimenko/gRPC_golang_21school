@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type WarehouseClient interface {
 	GetItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*Item, error)
 	SetItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error)
-	DeleteItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error)
+	DeleteItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*OperationResultResponse, error)
 }
 
 type warehouseClient struct {
@@ -53,7 +53,7 @@ func (c *warehouseClient) SetItem(ctx context.Context, in *Item, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *warehouseClient) DeleteItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error) {
+func (c *warehouseClient) DeleteItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*OperationResultResponse, error) {
 	out := new(OperationResultResponse)
 	err := c.cc.Invoke(ctx, "/Warehouse/DeleteItem", in, out, opts...)
 	if err != nil {
@@ -68,8 +68,7 @@ func (c *warehouseClient) DeleteItem(ctx context.Context, in *Item, opts ...grpc
 type WarehouseServer interface {
 	GetItem(context.Context, *ItemRequest) (*Item, error)
 	SetItem(context.Context, *Item) (*OperationResultResponse, error)
-	DeleteItem(context.Context, *Item) (*OperationResultResponse, error)
-	//mustEmbedUnimplementedWarehouseServer()
+	DeleteItem(context.Context, *ItemRequest) (*OperationResultResponse, error)
 }
 
 // UnimplementedWarehouseServer must be embedded to have forward compatible implementations.
@@ -82,7 +81,7 @@ func (UnimplementedWarehouseServer) GetItem(context.Context, *ItemRequest) (*Ite
 func (UnimplementedWarehouseServer) SetItem(context.Context, *Item) (*OperationResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetItem not implemented")
 }
-func (UnimplementedWarehouseServer) DeleteItem(context.Context, *Item) (*OperationResultResponse, error) {
+func (UnimplementedWarehouseServer) DeleteItem(context.Context, *ItemRequest) (*OperationResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteItem not implemented")
 }
 func (UnimplementedWarehouseServer) mustEmbedUnimplementedWarehouseServer() {}
@@ -135,7 +134,7 @@ func _Warehouse_SetItem_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _Warehouse_DeleteItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Item)
+	in := new(ItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,7 +146,7 @@ func _Warehouse_DeleteItem_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/Warehouse/DeleteItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WarehouseServer).DeleteItem(ctx, req.(*Item))
+		return srv.(WarehouseServer).DeleteItem(ctx, req.(*ItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
