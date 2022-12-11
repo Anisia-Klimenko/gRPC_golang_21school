@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -87,7 +88,8 @@ func main() {
 		if err != nil {
 			log.Fatalln("This and all other nodes are not available")
 		} else {
-			protos.NewWarehouseClient(conn)
+			client := protos.NewWarehouseClient(conn)
+			client.GetItem(context.Background(), &protos.ItemRequest{})
 			time.Sleep(time.Duration(5) * time.Second)
 		}
 	}
