@@ -7,6 +7,10 @@ import (
 	"log"
 	"net"
 	"time"
+	"strings"
+	"errors"
+	"os"
+	"bufio"
 
 	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
 
@@ -98,7 +102,6 @@ func main() {
 }
 
 func SendResponce(client protos.WarehouseClient){
-	var r Request
 	for {
 		myscanner := bufio.NewScanner(os.Stdin)
 		myscanner.Scan()
@@ -116,7 +119,7 @@ func SendResponce(client protos.WarehouseClient){
 					err := errors.New("non-valid amount of arguments")
 					fmt.Println(err)
 				}else{
-					resp, err := client.GetItem(context.Background(), protos.ItemRequest{UUID: strs[1]})
+					resp, err := client.GetItem(context.Background(), &protos.ItemRequest{UUID: strs[1]})
 					if err != nil {
 						fmt.Println(err)
 					} else {
@@ -127,7 +130,7 @@ func SendResponce(client protos.WarehouseClient){
 					err := errors.New("non-valid amount of arguments")
 					fmt.Println(err)
 				}else{
-					resp, err := client.SetItem(context.Background(), protos.Item{UUID: strs[1], Content: strs[2]})
+					resp, err := client.SetItem(context.Background(), &protos.Item{UUID: strs[1], Content: strs[2]})
 					if err != nil {
 						fmt.Println(err)
 					} else {
@@ -138,7 +141,7 @@ func SendResponce(client protos.WarehouseClient){
 					err := errors.New("non-valid amount of arguments")
 					fmt.Println(err)
 				}else{
-					resp, err := client.DeleteItem(context.Background(), protos.ItemRequest{UUID: strs[1]})
+					resp, err := client.DeleteItem(context.Background(), &protos.ItemRequest{UUID: strs[1]})
 					if err != nil {
 						fmt.Println(err)
 					} else {
@@ -157,7 +160,7 @@ func SendResponce(client protos.WarehouseClient){
 	// r := Request{GET, protos.ItemRequest{UUID: "asdas"}}
 	// 	// response := protos.Item{}
 	// }
-}
+
 
 // go func() {
 // 	knownHosts(ports)
