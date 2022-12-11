@@ -34,6 +34,10 @@ var Backups = map[string]string{
 func (c *Warehouse) GetItem(ctx context.Context, rr *protos.ItemRequest) (*protos.Item, error) {
 	var db []protos.Item
 	var err error
+	_, err = uuid.Parse(rr.UUID)
+	if err != nil {
+		return &protos.Item{}, err
+	}
 	for _, file := range Backups {
 		f, _ := ioutil.ReadFile(file)
 		err = json.Unmarshal(f, &db)
@@ -53,6 +57,7 @@ func (c *Warehouse) GetItem(ctx context.Context, rr *protos.ItemRequest) (*proto
 }
 
 func (c *Warehouse) SetItem(ctx context.Context, rr *protos.Item) (*protos.OperationResultResponse, error) {
+	var db []protos.Item
 	var err error
 	var newId uuid.UUID
 	if len(rr.UUID) == 0 {
@@ -60,28 +65,14 @@ func (c *Warehouse) SetItem(ctx context.Context, rr *protos.Item) (*protos.Opera
 	} else {
 		newId, err = uuid.Parse(rr.UUID)
 		if err != nil {
-			return &protos.OperationResultResponse{Msg: "error: key is not a proper uuid4"}, err
+			return &protos.OperationResultResponse{Msg: "key is not a proper uuid4"}, err
 		}
 	}
 	var newElem = protos.Item{UUID: newId.String(), Content: rr.Content}
-	text, _ := json.Marshal(newElem)
-	for _, file := range Backups {
-		f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-		_, err = f.WriteString(string(text))
-		if err == nil {
-			break
-		}
-		f.Close()
+	_, err = c.GetItem(ctx, &protos.ItemRequest{UUID: newElem.UUID})
+	if err == nil {
+		return &protos.OperationResultResponse{Msg: "item already exists"}, nil
 	}
-	if err != nil {
-		return &protos.OperationResultResponse{Msg: "error: " + err.Error()}, err
-	}
-	return &protos.OperationResultResponse{Msg: "created (2 replicas)"}, nil
-}
-
-func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.Item) (*protos.OperationResultResponse, error) {
-	var db []protos.Item
-	var err error
 	for _, file := range Backups {
 		f, _ := ioutil.ReadFile(file)
 		err = json.Unmarshal(f, &db)
@@ -92,6 +83,38 @@ func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.Item) (*protos.Op
 	if err != nil {
 		return &protos.OperationResultResponse{Msg: "backups broken"}, err
 	}
+	db = append(db, newElem)
+	newDb, _ := json.Marshal(db)
+	for _, file := range Backups {
+		f, _ := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+		err = f.Truncate(0)
+		_, err = f.Seek(0, 0)
+		_, err = fmt.Fprintf(f, "%s", string(newDb))
+	}
+	return &protos.OperationResultResponse{Msg: "created (2 replicas)"}, nil
+}
+
+func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.ItemRequest) (*protos.OperationResultResponse, error) {
+	var db []protos.Item
+	var err error
+	_, err = uuid.Parse(rr.UUID)
+	if err != nil {
+		return &protos.OperationResultResponse{Msg: "key is not a proper uuid4"}, err
+	}
+	for _, file := range Backups {
+		f, _ := ioutil.ReadFile(file)
+		err = json.Unmarshal(f, &db)
+		if err == nil {
+			break
+		}
+	}
+	if err != nil {
+		return &protos.OperationResultResponse{Msg: "backups broken"}, err
+	}
+	_, err = c.GetItem(ctx, &protos.ItemRequest{UUID: rr.UUID})
+	if err != nil {
+		return &protos.OperationResultResponse{Msg: "no such item"}, nil
+	}
 	for index, elem := range db {
 		if elem.UUID == rr.UUID {
 			db = append(db[:index], db[index+1:]...)
@@ -100,13 +123,10 @@ func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.Item) (*protos.Op
 	}
 	newDb, _ := json.Marshal(db)
 	for _, file := range Backups {
-		f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+		f, _ := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 		err = f.Truncate(0)
 		_, err = f.Seek(0, 0)
 		_, err = fmt.Fprintf(f, "%s", string(newDb))
-		if err == nil {
-			break
-		}
 	}
 	return &protos.OperationResultResponse{Msg: "deleted (2 replicas)"}, nil
 }
