@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 
+	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
+
 	"google.golang.org/grpc"
 )
 
@@ -55,7 +57,7 @@ func main() {
 		knownHosts(ports)
 		defer conn.Close()
 	} else {
-
+		r := Response{GET, protos.ItemRequest{UUID: "asdas"}}
 	}
 }
 
