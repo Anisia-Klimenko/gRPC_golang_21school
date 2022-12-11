@@ -1,16 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"net"
-	"time"
-	"strings"
-	"errors"
 	"os"
-	"bufio"
+	"strings"
 
 	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
 
@@ -93,15 +92,13 @@ func main() {
 			log.Fatalln("This and all other nodes are not available")
 		} else {
 			client := protos.NewWarehouseClient(conn)
+			printKnownHosts()
 			SendResponce(client)
-			// client.GetItem(context.Background(), &protos.ItemRequest{})
-			time.Sleep(time.Duration(5) * time.Second)
-
 		}
 	}
 }
 
-func SendResponce(client protos.WarehouseClient){
+func SendResponce(client protos.WarehouseClient) {
 	var strs []string
 	for {
 		myscanner := bufio.NewScanner(os.Stdin)
@@ -113,59 +110,61 @@ func SendResponce(client protos.WarehouseClient){
 			strs = strings.Split(line, " ")
 		}
 		switch {
-			case len(strs) != 2 && len(strs) != 3:
+		case len(strs) != 2 && len(strs) != 3:
+			err := errors.New("non-valid amount of arguments")
+			fmt.Println(err)
+		case !strings.ContainsAny(strs[0], "GET || SET || DELETE"):
+			err := errors.New("non-available command")
+			fmt.Println(err)
+		case strs[0] == "GET":
+			if len(strs) != 2 {
 				err := errors.New("non-valid amount of arguments")
 				fmt.Println(err)
-			case strings.ContainsAny(strs[0], "GET || SET || DELETE") == false:
-				err := errors.New("non-available command")
-				fmt.Println(err)
-			case strs[0] == "GET":
-				if (len(strs) != 2) {
-					err := errors.New("non-valid amount of arguments")
+			} else {
+				resp, err := client.GetItem(context.Background(), &protos.ItemRequest{UUID: strs[1]})
+				if err != nil {
 					fmt.Println(err)
-				}else{
-					resp, err := client.GetItem(context.Background(), &protos.ItemRequest{UUID: strs[1]})
-					if err != nil {
-						fmt.Println(err)
-					} else {
-					fmt.Printf("ID: %s, Content: %s \n", resp.UUID, resp.Content)}
-				}		
-			case strs[0] == "SET":
-				if (len(strs) != 3) {
-					err := errors.New("non-valid amount of arguments")
-					fmt.Println(err)
-				}else{
-					resp, err := client.SetItem(context.Background(), &protos.Item{UUID: strs[1], Content: strs[2]})
-					if err != nil {
-						fmt.Println(err)
-					} else {
-						fmt.Printf("Message: %s \n", resp.Msg)}
+				} else {
+					fmt.Printf("ID: %s, Content: %s \n", resp.UUID, resp.Content)
 				}
-			case strs[0] == "DELETE":
-				if (len(strs) != 2) {
-					err := errors.New("non-valid amount of arguments")
+			}
+		case strs[0] == "SET":
+			if len(strs) != 3 {
+				err := errors.New("non-valid amount of arguments")
+				fmt.Println(err)
+			} else {
+				resp, err := client.SetItem(context.Background(), &protos.Item{UUID: strs[1], Content: strs[2]})
+				if err != nil {
 					fmt.Println(err)
-				}else{
-					resp, err := client.DeleteItem(context.Background(), &protos.ItemRequest{UUID: strs[1]})
-					if err != nil {
-						fmt.Println(err)
-					} else {
-						fmt.Printf("Message: %s \n", resp.Msg)}
+				} else {
+					fmt.Printf("Message: %s \n", resp.Msg)
+				}
+			}
+		case strs[0] == "DELETE":
+			if len(strs) != 2 {
+				err := errors.New("non-valid amount of arguments")
+				fmt.Println(err)
+			} else {
+				resp, err := client.DeleteItem(context.Background(), &protos.ItemRequest{UUID: strs[1]})
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					fmt.Printf("Message: %s \n", resp.Msg)
 				}
 			}
 		}
+	}
 }
 
-	// }
-	// defer conn.Close()
-	// } else {
-	// 	conn, err = grpc.Dial(fmt.Sprintf("%s:%s", fHost, fPort), opts...)
-	// 	conn, err = grpc.Dial(fmt.Sprintf("%s:%s", fHost, fPort), opts...)
+// }
+// defer conn.Close()
+// } else {
+// 	conn, err = grpc.Dial(fmt.Sprintf("%s:%s", fHost, fPort), opts...)
+// 	conn, err = grpc.Dial(fmt.Sprintf("%s:%s", fHost, fPort), opts...)
 
-	// r := Request{GET, protos.ItemRequest{UUID: "asdas"}}
-	// 	// response := protos.Item{}
-	// }
-
+// r := Request{GET, protos.ItemRequest{UUID: "asdas"}}
+// 	// response := protos.Item{}
+// }
 
 // go func() {
 // 	knownHosts(ports)

@@ -6,6 +6,7 @@ service Warehouse {
     rpc GetItem(ItemRequest) returns (Item);
     rpc SetItem(Item) returns (OperationResultResponse);
     rpc DeleteItem(ItemRequest) returns (OperationResultResponse);
+    rpc IsAliveRequest(ItemRequest) returns (IsAliveResponse);
 }
 
 
@@ -18,4 +19,8 @@ message ItemRequest {
     string UUID = 1;
 }
 message OperationResultResponse {
-    string msg = 1;}
+    string msg = 1;
+}
+message IsAliveResponse {
+    bool msg = 1;
+}

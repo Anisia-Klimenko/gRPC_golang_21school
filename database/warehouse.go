@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"os"
+
+	"github.com/google/uuid"
 
 	//database "github.com/Anisia-Klimenko/gRPC_golang_21school/database"
 	protos "github.com/Anisia-Klimenko/gRPC_golang_21school/protos/warehouse"
@@ -129,4 +130,8 @@ func (c *Warehouse) DeleteItem(ctx context.Context, rr *protos.ItemRequest) (*pr
 		_, err = fmt.Fprintf(f, "%s", string(newDb))
 	}
 	return &protos.OperationResultResponse{Msg: "deleted (2 replicas)"}, nil
+}
+
+func (c *Warehouse) IsAliveRequest(ctx context.Context, rr *protos.ItemRequest) (*protos.IsAliveResponse, error) {
+	return &protos.IsAliveResponse{Msg: true}, nil
 }

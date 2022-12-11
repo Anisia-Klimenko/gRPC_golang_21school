@@ -25,6 +25,7 @@ type WarehouseClient interface {
 	GetItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*Item, error)
 	SetItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*OperationResultResponse, error)
 	DeleteItem(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*OperationResultResponse, error)
+	IsAliveRequest(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*IsAliveResponse, error)
 }
 
 type warehouseClient struct {
@@ -62,6 +63,15 @@ func (c *warehouseClient) DeleteItem(ctx context.Context, in *ItemRequest, opts 
 	return out, nil
 }
 
+func (c *warehouseClient) IsAliveRequest(ctx context.Context, in *ItemRequest, opts ...grpc.CallOption) (*IsAliveResponse, error) {
+	out := new(IsAliveResponse)
+	err := c.cc.Invoke(ctx, "/Warehouse/IsAliveRequest", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WarehouseServer is the server API for Warehouse service.
 // All implementations must embed UnimplementedWarehouseServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type WarehouseServer interface {
 	GetItem(context.Context, *ItemRequest) (*Item, error)
 	SetItem(context.Context, *Item) (*OperationResultResponse, error)
 	DeleteItem(context.Context, *ItemRequest) (*OperationResultResponse, error)
+	IsAliveRequest(context.Context, *ItemRequest) (*IsAliveResponse, error)
 }
 
 // UnimplementedWarehouseServer must be embedded to have forward compatible implementations.
@@ -83,6 +94,9 @@ func (UnimplementedWarehouseServer) SetItem(context.Context, *Item) (*OperationR
 }
 func (UnimplementedWarehouseServer) DeleteItem(context.Context, *ItemRequest) (*OperationResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteItem not implemented")
+}
+func (UnimplementedWarehouseServer) IsAliveRequest(context.Context, *ItemRequest) (*IsAliveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAliveRequest not implemented")
 }
 func (UnimplementedWarehouseServer) mustEmbedUnimplementedWarehouseServer() {}
 
@@ -151,6 +165,24 @@ func _Warehouse_DeleteItem_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Warehouse_IsAliveRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WarehouseServer).IsAliveRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Warehouse/IsAliveRequest",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WarehouseServer).IsAliveRequest(ctx, req.(*ItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Warehouse_ServiceDesc is the grpc.ServiceDesc for Warehouse service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -169,6 +201,10 @@ var Warehouse_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteItem",
 			Handler:    _Warehouse_DeleteItem_Handler,
+		},
+		{
+			MethodName: "IsAliveRequest",
+			Handler:    _Warehouse_IsAliveRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
