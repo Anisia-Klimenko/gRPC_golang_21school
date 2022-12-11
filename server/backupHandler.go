@@ -47,9 +47,19 @@ func GetItemFromBackup(uuid *protos.UUID) (protos.GetItemResponse, error) {
 	return protos.GetItemResponse{}, errors.New("element not found")
 }
 
-func SetItemToBackup(elem string) protos.OperationResultResponse {
+func SetItemToBackup(id *protos.UUID, req *protos.GetItemResponse) (protos.OperationResultResponse, error) {
+	var newId uuid.UUID
 	var err error
-	var newElem = DB{protos.UUID{Value: uuid.New().String()}, protos.GetItemResponse{Name: elem}}
+	if len(id.Value) == 0 {
+		newId = uuid.New()
+	} else {
+		newId, err = uuid.Parse(id.Value)
+		if err != nil {
+			return protos.OperationResultResponse{Msg: "error: key is not a proper uuid4"}, err
+		}
+	}
+	var newElem = DB{protos.UUID{Value: newId.String()}, *req}
+	//var newElem = DB{protos.UUID{Value: uuid.New().String()}, protos.GetItemResponse{Name: elem}}
 	text, _ := json.Marshal(newElem)
 	for _, file := range Backups {
 		f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
@@ -60,9 +70,9 @@ func SetItemToBackup(elem string) protos.OperationResultResponse {
 		f.Close()
 	}
 	if err != nil {
-		return protos.OperationResultResponse{Msg: "error: " + err.Error()}
+		return protos.OperationResultResponse{Msg: "error: " + err.Error()}, err
 	}
-	return protos.OperationResultResponse{Msg: "created (2 replicas)"}
+	return protos.OperationResultResponse{Msg: "created (2 replicas)"}, nil
 }
 
 func DeleteItemFromBackup(uuid *protos.UUID) protos.OperationResultResponse {
@@ -75,6 +85,7 @@ func DeleteItemFromBackup(uuid *protos.UUID) protos.OperationResultResponse {
 			break
 		}
 	}
+
 	if err != nil {
 		return protos.OperationResultResponse{Msg: "backups broken"}
 	}
